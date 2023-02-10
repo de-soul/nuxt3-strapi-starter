@@ -1,14 +1,14 @@
 <template>
   <div>
     <pre>
-      {{response}}
+      {{ response }}
     </pre>
   </div>
 </template>
 
 <script setup>
-  //import type { Restaurant } from '~/types'
-  const { find } = useStrapi()
-  const response = await find('tests')
-  console.log(response)
+//import type { Restaurant } from '~/types'
+const { find } = useStrapi();
+const response = await find("tests");
+console.log(response);
 </script>

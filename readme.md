@@ -83,3 +83,45 @@
 ```
 
 На главной появится содержимое коллекции Test
+
+## Подключение ESLint и Prettier к Nuxt
+
+> Выполняется из директории проекта frontend
+
+Устанавливаем необходимые модули
+
+`npm install eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser @vue/eslint-config-standard eslint-config-prettier eslint-plugin-prettier eslint-plugin-nuxt eslint-plugin-vue --save-dev`
+
+Создаем файл `.eslintrc.js`
+
+```javascript
+module.exports = {
+    root: true,
+    env: {
+        browser: true,
+        node: true,
+    },
+    parserOptions: {
+        ecmaVersion: 2020,
+        sourceType: "module",
+        parser: "@typescript-eslint/parser",
+    },
+    extends: [
+        "plugin:@typescript-eslint/recommended",
+        "plugin:nuxt/recommended",
+        "plugin:vue/vue3-recommended",
+        "plugin:prettier/recommended",
+    ],
+    plugins: ["@typescript-eslint"],
+    rules: {
+        "vue/script-setup-no-uses-vars": "off",
+    },
+};
+```
+Включаем автофиксинг кода при сохранении в WebStorm в настройках проекта (`Ctrl + Alt + S`)
+
+![](./readme-eslint.png)
+
+## Полезные ссылки
+
+https://itnext.io/nuxt-3-first-steps-c23d142405c4

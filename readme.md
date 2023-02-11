@@ -190,7 +190,7 @@ vite: {
       <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer" />
       <v-toolbar-title>
         <nuxt-link to="/" style="text-decoration: none; color: inherit">
-          nuxt-3-strapi-starter
+          nuxt3-strapi-starter
         </nuxt-link>
       </v-toolbar-title>
       <v-spacer />

@@ -16,6 +16,8 @@
 
 <script setup>
 const { find } = useStrapi();
-const response = await find("tests");
-console.log(response);
+const { data } = await find("tests");
+const response = computed(() =>
+  data.map((r) => ({ id: r.id, ...r.attributes }))
+);
 </script>

@@ -1,6 +1,10 @@
 export default defineNuxtConfig({
   ssr: false,
-  modules: ["@nuxtjs/strapi", "@pinia/nuxt"],
+  modules: ["@nuxtjs/strapi", "@pinia/nuxt", "@nuxt/devtools"],
+  devtools: {
+    enabled: true,
+    vscode: {},
+  },
   strapi: {
     url: process.env.STRAPI_URL || "http://127.0.0.1:1337",
     prefix: "/api",

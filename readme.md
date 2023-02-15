@@ -316,6 +316,25 @@ console.log("Test page loaded");
 </script>
 ```
 
-## Полезные ссылки
+## Добавление DevTools
+
+Установка
+```
+npm i -D @nuxt/devtools
+```
+
+Добавление в nuxt.config.js
+```javascript
+...
+  modules: ["@nuxt/devtools"],
+  devtools: {
+    enabled: true,
+    vscode: {},
+  },
+...
+```
+DevTools можно будет включить по нажатию `Alt / ⌥ Option + D` или при нажатии кнопки Nuxt снизу
+
+# Полезные ссылки
 
 https://itnext.io/nuxt-3-first-steps-c23d142405c4

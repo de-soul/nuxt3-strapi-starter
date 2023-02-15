@@ -18,8 +18,10 @@
               : 'mdi-weather-sunny'
           "
           @click="toggleTheme"
-        >
-        </v-switch>
+        />
+        <v-btn v-show="user" icon>
+          <v-icon @click="logoutOperation">mdi-logout</v-icon>
+        </v-btn>
       </v-toolbar-items>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" temporary>
@@ -35,6 +37,7 @@
     </v-navigation-drawer>
     <v-main>
       <slot />
+      <NotifySnackbar />
     </v-main>
     <v-footer app absolute>
       <v-row justify="center" no-gutters>
@@ -49,6 +52,9 @@
 <script setup>
 /* imports */
 import { useTheme } from "vuetify";
+const user = useStrapiUser();
+const { logout } = useStrapiAuth();
+const theme = useTheme();
 /* data */
 const drawer = ref(false);
 const items = [
@@ -63,9 +69,12 @@ const items = [
     to: "/test",
   },
 ];
-const theme = useTheme();
 /* methods */
 const toggleTheme = () => {
   theme.global.name.value = theme.global.current.value.dark ? "light" : "dark";
+};
+const logoutOperation = async () => {
+  await logout();
+  await navigateTo("/auth/login");
 };
 </script>

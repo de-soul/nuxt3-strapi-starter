@@ -11,5 +11,10 @@
 </template>
 
 <script setup>
-console.log("Test page loaded");
+/* imports */
+/* middleware */
+definePageMeta({ middleware: "auth" });
+/* data */
+/* computed */
+/* methods */
 </script>

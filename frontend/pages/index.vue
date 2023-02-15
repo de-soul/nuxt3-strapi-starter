@@ -15,9 +15,15 @@
 </template>
 
 <script setup>
+/* imports */
+/* middleware */
+definePageMeta({ middleware: "auth" });
+/* data */
 const { find } = useStrapi();
 const { data } = await find("tests");
+/* computed */
 const response = computed(() =>
   data.map((r) => ({ id: r.id, ...r.attributes }))
 );
+/* methods */
 </script>

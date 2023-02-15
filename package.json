@@ -5,6 +5,9 @@
     "develop:backend": "npm run --prefix backend develop",
     "develop:frontend": "wait-on http://localhost:1337/admin && npm run --prefix frontend dev",
     "develop": "cross-env FORCE_COLOR=1 npm-run-all -l -p develop:*",
+    "production:backend": "npm run --prefix backend start",
+    "production:frontend": "wait-on http://localhost:1337/admin && npm run --prefix frontend build && npm run --prefix frontend preview",
+    "production": "cross-env FORCE_COLOR=1 npm-run-all -l -p production:*",
     "lint": "eslint --ext .js,.ts --ignore-path .eslintignore ."
   },
   "devDependencies": {

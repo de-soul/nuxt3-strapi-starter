@@ -205,7 +205,7 @@ vite: {
         </nuxt-link>
       </v-toolbar-title>
       <v-spacer />
-      <v-toolbar-items>
+      <v-toolbar-pages>
         <v-switch
           inset
           class="pr-3 pt-1"
@@ -217,12 +217,12 @@ vite: {
           @click="toggleTheme"
         >
         </v-switch>
-      </v-toolbar-items>
+      </v-toolbar-pages>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" temporary>
       <v-list nav>
         <v-list-item
-          v-for="(item, index) in items"
+          v-for="(item, index) in pages"
           :key="index"
           :title="item.title"
           :to="item.to"
@@ -248,7 +248,7 @@ vite: {
 import { useTheme } from "vuetify";
 /* data */
 const drawer = ref(false);
-const items = [
+const pages = [
   {
     icon: "mdi-home",
     title: "Home",

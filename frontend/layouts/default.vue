@@ -1,50 +1,73 @@
 <template>
   <v-app>
-    <v-app-bar>
-      <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer" />
-      <v-toolbar-title>
-        <nuxt-link to="/" style="text-decoration: none; color: inherit">
-          nuxt3-strapi-starter
-        </nuxt-link>
-      </v-toolbar-title>
-      <v-spacer />
-      <v-toolbar-items>
-        <v-switch
-          inset
-          class="pr-3 pt-1"
-          :prepend-icon="
-            theme.name.value === 'dark'
-              ? 'mdi-weather-night'
-              : 'mdi-weather-sunny'
-          "
-          @click="toggleTheme"
-        />
-        <v-btn v-show="user" icon>
-          <v-icon @click="logoutOperation">mdi-logout</v-icon>
-        </v-btn>
-      </v-toolbar-items>
-    </v-app-bar>
-    <v-navigation-drawer v-model="drawer" temporary>
+    <v-navigation-drawer
+      v-if="user"
+      v-model="drawer"
+      :rail="rail"
+      permanent
+      temporary
+    >
+      <v-list nav>
+        <v-list-item @click="rail = !rail">
+          <template #prepend>
+            <v-icon>{{ rail ? "mdi-menu" : "mdi-menu-open" }}</v-icon>
+          </template>
+          <template #title>
+            <div class="text-subtitle-1">nuxt3-strapi-starter</div>
+          </template>
+        </v-list-item>
+      </v-list>
+      <v-divider />
       <v-list nav>
         <v-list-item
-          v-for="(item, index) in items"
+          v-for="(page, index) in pages"
           :key="index"
-          :title="item.title"
-          :to="item.to"
-          :prepend-icon="item.icon"
+          :title="page.title"
+          :to="page.to"
+          :prepend-icon="page.icon"
         />
       </v-list>
+      <template #append>
+        <v-list nav>
+          <v-list-item
+            :prepend-icon="
+              theme.global.current.value.dark
+                ? 'mdi-weather-night'
+                : 'mdi-weather-sunny'
+            "
+            :title="
+              theme.global.current.value.dark ? 'Dark theme' : 'Light theme'
+            "
+            @click="toggleTheme"
+          />
+          <v-list-item
+            prepend-icon="mdi-account-circle"
+            :title="user.username"
+            :subtitle="user.email"
+            to="/profile"
+          />
+        </v-list>
+        <v-divider />
+        <v-list nav>
+          <v-list-item
+            prepend-icon="mdi-logout"
+            title="Logout"
+            @click="logoutOperation"
+          />
+        </v-list>
+      </template>
     </v-navigation-drawer>
     <v-main>
       <slot />
-      <NotifySnackbar />
     </v-main>
-    <v-footer app absolute>
-      <v-row justify="center" no-gutters>
-        <v-col class="text-center" cols="12">
+    <NotifySnackbar />
+
+    <v-footer app absolute class="bg-transparent justify-center">
+      <v-card density="compact" flat>
+        <v-card-text>
           {{ new Date().getFullYear() }} &copy; <strong>deSoul</strong>
-        </v-col>
-      </v-row>
+        </v-card-text>
+      </v-card>
     </v-footer>
   </v-app>
 </template>
@@ -56,16 +79,17 @@ const user = useStrapiUser();
 const { logout } = useStrapiAuth();
 const theme = useTheme();
 /* data */
-const drawer = ref(false);
-const items = [
+const drawer = ref(true);
+const rail = ref(true);
+const pages = [
   {
     icon: "mdi-home",
-    title: "Home",
+    title: "Home page",
     to: "/",
   },
   {
     icon: "mdi-book-open-page-variant",
-    title: "Test",
+    title: "Test page",
     to: "/test",
   },
 ];

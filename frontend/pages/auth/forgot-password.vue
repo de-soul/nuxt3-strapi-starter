@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="fill-height">
     <v-row align="center" justify="center">
       <v-col class="v-col-12 v-col-md-4">
         <v-card prepend-icon="mdi-login">
@@ -9,6 +9,7 @@
               Set new password by email confirmation request
             </v-card-subtitle>
           </template>
+          <v-divider />
           <v-card-text>
             <v-form
               v-if="message.length == 0"
@@ -41,6 +42,27 @@
                 {{ message }}
               </p>
             </v-alert>
+          </v-card-text>
+          <v-divider />
+          <v-card-text class="text-center bg-transparent py-3">
+            <v-row dense no-gutters>
+              <v-col class="text-left">
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/register"
+                >
+                  Registration
+                </nuxt-link>
+              </v-col>
+              <v-col class="text-right">
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/login"
+                >
+                  Login
+                </nuxt-link>
+              </v-col>
+            </v-row>
           </v-card-text>
         </v-card>
       </v-col>

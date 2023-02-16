@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="fill-height">
     <v-row align="center" justify="center">
       <v-col class="v-col-12 v-col-md-4">
         <v-card prepend-icon="mdi-account-plus">
@@ -7,6 +7,7 @@
             Register new account
             <v-card-subtitle> Obtain application features </v-card-subtitle>
           </template>
+          <v-divider />
           <v-card-text>
             <v-form
               v-if="!waitConfirm"
@@ -61,15 +62,24 @@
               <p>After confirmation you can login to application.</p>
             </v-alert>
           </v-card-text>
+          <v-divider />
           <v-card-text class="text-center bg-transparent py-3">
             <v-row dense no-gutters>
               <v-col class="text-left">
-                <nuxt-link to="/auth/forgot-password">
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/forgot-password"
+                >
                   Forgot password?
                 </nuxt-link>
               </v-col>
               <v-col class="text-right">
-                <nuxt-link to="/auth/login"> Login </nuxt-link>
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/login"
+                >
+                  Login
+                </nuxt-link>
               </v-col>
             </v-row>
           </v-card-text>

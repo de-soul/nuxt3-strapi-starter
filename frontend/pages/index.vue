@@ -1,10 +1,11 @@
 <template>
-  <v-container>
+  <v-container fluid>
     <v-card prepend-icon="mdi-home">
       <template #title>
         Home
         <v-card-subtitle>First page</v-card-subtitle>
       </template>
+      <v-divider />
       <v-card-text>
         <v-code>
           <pre>{{ flattenResponse(data) }}</pre>

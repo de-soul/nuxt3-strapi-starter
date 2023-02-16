@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="fill-height">
     <v-row align="center" justify="center">
       <v-col class="v-col-12 v-col-md-4">
         <v-card prepend-icon="mdi-login">
@@ -7,6 +7,7 @@
             Login
             <v-card-subtitle>Please authenticate</v-card-subtitle>
           </template>
+          <v-divider />
           <v-card-text>
             <v-form ref="form" v-model="valid" @submit.prevent="loginOperation">
               <v-text-field
@@ -38,15 +39,24 @@
               </v-btn>
             </v-form>
           </v-card-text>
+          <v-divider />
           <v-card-text class="text-center bg-transparent py-3">
             <v-row dense no-gutters>
               <v-col class="text-left">
-                <nuxt-link to="/auth/forgot-password">
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/forgot-password"
+                >
                   Forgot password?
                 </nuxt-link>
               </v-col>
               <v-col class="text-right">
-                <nuxt-link to="/auth/register"> Registration </nuxt-link>
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/register"
+                >
+                  Registration
+                </nuxt-link>
               </v-col>
             </v-row>
           </v-card-text>

@@ -2,6 +2,15 @@
 
 > Проект представляет из себя стартовый набор для разворачивания full-stack приложения на базе фронтенда: Nuxt 3 + Vuetify 3 и бэкенда Strapi 4. Фронтент и бекенд можно запускать по отдельности или вместе, используя оберточный проект, расположенный в корне. 
 
+# В проекте реализованы
+- Шаблонизатор Nuxt 3 (`/layout`, `/pages`)
+- Хранилище Pinia (`/stores`)
+- Функции переиспользования кода (`/composables`)
+- Компоненты (`/components`)
+- Промежуточное ПО (`/middleware`)
+- Модули (`@nuxtjs/strapi`, `@pinia/nuxt`, `@nuxt/devtools`)
+- Headless CMS (`StrapiJS`)
+
 # Быстрый старт
 
 1. Склонируйте репозиторий
@@ -23,9 +32,11 @@
   "scripts": {
     "develop:backend": "npm run --prefix backend develop",
     "develop:frontend": "wait-on http://localhost:1337/admin && npm run --prefix frontend dev",
-    "develop": "cross-env FORCE_COLOR=1 npm-run-all -l -p develop:*"
-  },
-  "dependencies": {
+    "develop": "cross-env FORCE_COLOR=1 npm-run-all -l -p develop:*",
+    "production:backend": "npm run --prefix backend start",
+    "production:frontend": "wait-on http://localhost:1337/admin && npm run --prefix frontend build && npm run --prefix frontend preview",
+    "production": "cross-env FORCE_COLOR=1 npm-run-all -l -p production:*",
+    "lint": "eslint --ext .js,.ts --ignore-path .eslintignore ."
   }
 }
 ```
@@ -61,16 +72,20 @@
 1. `npm install @nuxtjs/strapi --save-dev`
 2. В конфигурационный файл Nuxt `nuxt.config.js` добавляются настройки:
 ```javascript
-  export default {  
-    modules: ['@nuxtjs/strapi'],  
-    strapi: {  
-        url: process.env.STRAPI_URL || 'http://127.0.0.1:1337',  
-        prefix: '/api',  
-        version: 'v4',  
-        cookie: {},  
-        cookieName: 'strapi_jwt'
-    }
-}
+  strapi: {
+    url: process.env.STRAPI_URL || "http://127.0.0.1:1337",
+        prefix: "/api",
+        version: "v4",
+        cookieName: "strapi_jwt",
+        key: "authToken",
+        cookie: {
+        maxAge: 7 * 24 * 3600 * 1000,
+            sameSite: "lax",
+            secure: true,
+            path: "/",
+            httpOnly: false,
+    },
+},
 ```
 
 ## Проверка извлечения данных Nuxt из Strapi
@@ -190,55 +205,85 @@ vite: {
 > Выполняется из директории проекта frontend
 
 Включение шаблонизатора позволит разделить структуру приложения Nuxt на общий шаблон (`layout`) и страницы (`pages`). Это общая практика создания приложений. 
-Для включения шаблонизатора следует отказаться от точки входа приложения через `App.vue`, поэтому удаляем его.
+Для включения шаблонизатора следует отказаться от точки входа приложения через `App.vue`, поэтому *удаляем* его.
 
 Создаем директории `layouts` и `pages`. В `layouts` создаем `default.vue` с содержимым:
+
+<blockquote>
+<details>
+<summary>default.vue</summary>
 
 ```vue
 <template>
   <v-app>
-    <v-app-bar>
-      <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer" />
-      <v-toolbar-title>
-        <nuxt-link to="/" style="text-decoration: none; color: inherit">
-          nuxt3-strapi-starter
-        </nuxt-link>
-      </v-toolbar-title>
-      <v-spacer />
-      <v-toolbar-pages>
-        <v-switch
-          inset
-          class="pr-3 pt-1"
-          :prepend-icon="
-            theme.name.value === 'dark'
-              ? 'mdi-weather-night'
-              : 'mdi-weather-sunny'
-          "
-          @click="toggleTheme"
-        >
-        </v-switch>
-      </v-toolbar-pages>
-    </v-app-bar>
-    <v-navigation-drawer v-model="drawer" temporary>
+    <v-navigation-drawer
+        v-if="user"
+        v-model="drawer"
+        :rail="rail"
+        permanent
+        temporary
+    >
+      <v-list nav>
+        <v-list-item @click="rail = !rail">
+          <template #prepend>
+            <v-icon>{{ rail ? "mdi-menu" : "mdi-menu-open" }}</v-icon>
+          </template>
+          <template #title>
+            <div class="text-subtitle-1">nuxt3-strapi-starter</div>
+          </template>
+        </v-list-item>
+      </v-list>
+      <v-divider />
       <v-list nav>
         <v-list-item
-          v-for="(item, index) in pages"
-          :key="index"
-          :title="item.title"
-          :to="item.to"
-          :prepend-icon="item.icon"
+            v-for="(page, index) in pages"
+            :key="index"
+            :title="page.title"
+            :to="page.to"
+            :prepend-icon="page.icon"
         />
       </v-list>
+      <template #append>
+        <v-list nav>
+          <v-list-item
+              :prepend-icon="
+              theme.global.current.value.dark
+                ? 'mdi-weather-night'
+                : 'mdi-weather-sunny'
+            "
+              :title="
+              theme.global.current.value.dark ? 'Dark theme' : 'Light theme'
+            "
+              @click="toggleTheme"
+          />
+          <v-list-item
+              prepend-icon="mdi-account-circle"
+              :title="user.username"
+              :subtitle="user.email"
+              to="/profile"
+          />
+        </v-list>
+        <v-divider />
+        <v-list nav>
+          <v-list-item
+              prepend-icon="mdi-logout"
+              title="Logout"
+              @click="logoutOperation"
+          />
+        </v-list>
+      </template>
     </v-navigation-drawer>
     <v-main>
       <slot />
     </v-main>
-    <v-footer app absolute>
-      <v-row justify="center" no-gutters>
-        <v-col class="text-center" cols="12">
+    <NotifySnackbar />
+
+    <v-footer app absolute class="bg-transparent justify-center">
+      <v-card density="compact" flat>
+        <v-card-text>
           {{ new Date().getFullYear() }} &copy; <strong>deSoul</strong>
-        </v-col>
-      </v-row>
+        </v-card-text>
+      </v-card>
     </v-footer>
   </v-app>
 </template>
@@ -246,41 +291,57 @@ vite: {
 <script setup>
 /* imports */
 import { useTheme } from "vuetify";
+const user = useStrapiUser();
+const { logout } = useStrapiAuth();
+const theme = useTheme();
 /* data */
-const drawer = ref(false);
+const drawer = ref(true);
+const rail = ref(true);
 const pages = [
   {
     icon: "mdi-home",
-    title: "Home",
+    title: "Home page",
     to: "/",
   },
   {
     icon: "mdi-book-open-page-variant",
-    title: "Test",
+    title: "Test page",
     to: "/test",
   },
 ];
-const theme = useTheme();
 /* methods */
 const toggleTheme = () => {
   theme.global.name.value = theme.global.current.value.dark ? "light" : "dark";
 };
+const logoutOperation = async () => {
+  await logout();
+  await navigateTo("/auth/login");
+};
 </script>
 ```
+</details>
+</blockquote>
+
 
 В `pages` создаем страницу`index.vue` с содержимым:
 
+
+<blockquote>
+<details>
+<summary>index.vue</summary>
+
 ```vue
 <template>
-  <v-container>
+  <v-container fluid>
     <v-card prepend-icon="mdi-home">
       <template #title>
         Home
         <v-card-subtitle>First page</v-card-subtitle>
       </template>
+      <v-divider />
       <v-card-text>
         <v-code>
-          <pre>{{ response }}</pre>
+          <pre>{{ flattenResponse(data) }}</pre>
         </v-code>
       </v-card-text>
     </v-card>
@@ -288,33 +349,444 @@ const toggleTheme = () => {
 </template>
 
 <script setup>
+/* imports */
 const { find } = useStrapi();
+const { flattenResponse } = useStrapiResponse();
+/* middleware */
+definePageMeta({ middleware: "auth" });
+/* data */
 const { data } = await find("tests");
-const response = computed(() =>
-    data.map((r) => ({ id: r.id, ...r.attributes }))
-);
+/* computed */
+/* methods */
 </script>
 ```
+</details>
+</blockquote>
 
 И страницу `test.vue` с содержимым:
 
+<blockquote>
+<details>
+<summary>test.vue</summary>
+
 ```vue
 <template>
-  <v-container>
+  <v-container fluid>
     <v-card prepend-icon="mdi-book-open-page-variant">
       <template #title>
         Test
         <v-card-subtitle>Second page</v-card-subtitle>
       </template>
+      <v-divider />
       <v-card-text> Some test content </v-card-text>
     </v-card>
   </v-container>
 </template>
 
 <script setup>
-console.log("Test page loaded");
+/* imports */
+/* middleware */
+definePageMeta({ middleware: "auth" });
+/* data */
+/* computed */
+/* methods */
 </script>
 ```
+</details>
+</blockquote>
+
+## Добавление авторизации
+
+В `pages` создаем директорию `auth`, в ней создаем шаблоны страниц:
+
+
+<blockquote>
+<details>
+<summary>login.vue</summary>
+
+```vue
+<template>
+  <v-container fluid class="fill-height">
+    <v-row align="center" justify="center">
+      <v-col class="v-col-12 v-col-md-4">
+        <v-card prepend-icon="mdi-login">
+          <template #title>
+            Login
+            <v-card-subtitle>Please authenticate</v-card-subtitle>
+          </template>
+          <v-divider />
+          <v-card-text>
+            <v-form ref="form" v-model="valid" @submit.prevent="loginOperation">
+              <v-text-field
+                v-model="username"
+                label="E-mail or username"
+                required
+                :rules="loginRules"
+              ></v-text-field>
+              <v-text-field
+                v-model="password"
+                label="Password"
+                required
+                :append-inner-icon="hidePassword ? 'mdi-eye-off' : 'mdi-eye'"
+                :type="hidePassword ? 'password' : 'text'"
+                :rules="passwordRules"
+                @click:append-inner="() => (hidePassword = !hidePassword)"
+              ></v-text-field>
+              <v-btn
+                :disabled="!valid"
+                class="mt-3"
+                tile
+                :loading="loading"
+                color="green"
+                solo
+                block
+                type="submit"
+              >
+                Login
+              </v-btn>
+            </v-form>
+          </v-card-text>
+          <v-divider />
+          <v-card-text class="text-center bg-transparent py-3">
+            <v-row dense no-gutters>
+              <v-col class="text-left">
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/forgot-password"
+                >
+                  Forgot password?
+                </nuxt-link>
+              </v-col>
+              <v-col class="text-right">
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/register"
+                >
+                  Registration
+                </nuxt-link>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script setup>
+/* imports */
+const { login, fetchUser } = useStrapiAuth();
+/* data */
+const form = ref(null);
+const valid = ref("");
+const hidePassword = ref(true);
+const loading = ref(false);
+const username = ref("");
+const password = ref("");
+const loginRules = [
+  (v) => !!v || "This field is required",
+  (v) => v.length >= 3 || "Login must be more than 3 characters",
+];
+const passwordRules = [
+  (v) => !!v || "This field is required",
+  (v) => v.length <= 20 || "Password must be less than 20 characters",
+];
+/* computed */
+/* methods */
+const loginOperation = async () => {
+  loading.value = true;
+  if (form.value.validate()) {
+    try {
+      await login({
+        identifier: username.value,
+        password: password.value,
+      });
+      await fetchUser();
+      navigateTo("/");
+    } catch (e) {
+      console.log(e);
+    }
+    loading.value = false;
+  }
+};
+/* hooks */
+// onMounted(() => {});
+</script>
+
+```
+</details>
+</blockquote>
+
+<blockquote>
+<details>
+<summary>register.vue</summary>
+
+```vue
+<template>
+  <v-container fluid class="fill-height">
+    <v-row align="center" justify="center">
+      <v-col class="v-col-12 v-col-md-4">
+        <v-card prepend-icon="mdi-account-plus">
+          <template #title>
+            Register new account
+            <v-card-subtitle> Obtain application features </v-card-subtitle>
+          </template>
+          <v-divider />
+          <v-card-text>
+            <v-form
+              v-if="!waitConfirm"
+              ref="form"
+              v-model="valid"
+              @submit.prevent="registerOperation"
+            >
+              <v-text-field
+                v-model="username"
+                label="Username"
+                required
+                type="text"
+                :rules="loginRules"
+              />
+              <v-text-field
+                v-model="email"
+                label="E-mail"
+                required
+                type="text"
+                :rules="emailRules"
+              />
+              <v-text-field
+                v-model="password"
+                label="Password"
+                required
+                :append-inner-icon="hidePassword ? 'mdi-eye-off' : 'mdi-eye'"
+                :type="hidePassword ? 'password' : 'text'"
+                :rules="passwordRules"
+                @click:append-inner="() => (hidePassword = !hidePassword)"
+              />
+              <v-btn
+                :disabled="!valid"
+                class="mt-3"
+                tile
+                :loading="loading"
+                color="green"
+                solo
+                block
+                type="submit"
+              >
+                Register
+              </v-btn>
+            </v-form>
+            <v-alert v-else color="green">
+              <p>
+                User <b>{{ username }}</b> registered!
+              </p>
+              <p>
+                Please check your email <b>{{ email }}</b> for account
+                confirmation.
+              </p>
+              <p>After confirmation you can login to application.</p>
+            </v-alert>
+          </v-card-text>
+          <v-divider />
+          <v-card-text class="text-center bg-transparent py-3">
+            <v-row dense no-gutters>
+              <v-col class="text-left">
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/forgot-password"
+                >
+                  Forgot password?
+                </nuxt-link>
+              </v-col>
+              <v-col class="text-right">
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/login"
+                >
+                  Login
+                </nuxt-link>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script setup>
+/* imports */
+const { register, login, fetchUser } = useStrapiAuth();
+const { setSnackbar } = useSnackbarStore();
+/* data */
+const form = ref(null);
+const valid = ref("");
+const hidePassword = ref(true);
+const loading = ref(false);
+const username = ref("");
+const email = ref("");
+const password = ref("");
+const waitConfirm = ref(false);
+const loginRules = [
+  (v) => !!v || "This field is required",
+  (v) => v.length >= 3 || "Login must be more than 3 characters",
+];
+const emailRules = [
+  (v) => !!v || "This field is required",
+  (v) => /.+@.+\..+/.test(v) || "E-mail must have correct format",
+];
+const passwordRules = [
+  (v) => !!v || "This field is required",
+  (v) => v.length <= 20 || "Password must be less than 20 characters",
+];
+/* computed */
+/* methods */
+const registerOperation = async () => {
+  loading.value = true;
+  if (form.value.validate()) {
+    try {
+      const { user } = await register({
+        username: username.value,
+        email: email.value,
+        password: password.value,
+      });
+      if (user.value.confirmed) {
+        await login({
+          identifier: username.value,
+          password: password.value,
+        });
+        navigateTo("/");
+      } else {
+        waitConfirm.value = true;
+      }
+    } catch (e) {
+      waitConfirm.value = false;
+      console.log(e);
+    }
+  }
+  loading.value = false;
+};
+/* hooks */
+// onMounted(() => {});
+</script>
+
+```
+</details>
+</blockquote>
+
+<blockquote>
+<details>
+<summary>forgot-password.vue</summary>
+
+```vue
+<template>
+  <v-container fluid class="fill-height">
+    <v-row align="center" justify="center">
+      <v-col class="v-col-12 v-col-md-4">
+        <v-card prepend-icon="mdi-login">
+          <template #title>
+            Forgot password
+            <v-card-subtitle>
+              Set new password by email confirmation request
+            </v-card-subtitle>
+          </template>
+          <v-divider />
+          <v-card-text>
+            <v-form
+              v-if="message.length == 0"
+              ref="form"
+              v-model="valid"
+              @submit.prevent="forgotOperation"
+            >
+              <v-text-field
+                v-model="email"
+                label="E-mail"
+                required
+                type="text"
+                :rules="emailRules"
+              />
+              <v-btn
+                :disabled="!valid"
+                class="mt-3"
+                tile
+                :loading="loading"
+                color="success"
+                solo
+                block
+                type="submit"
+              >
+                Email me a reset link
+              </v-btn>
+            </v-form>
+            <v-alert v-else color="green">
+              <p>
+                {{ message }}
+              </p>
+            </v-alert>
+          </v-card-text>
+          <v-divider />
+          <v-card-text class="text-center bg-transparent py-3">
+            <v-row dense no-gutters>
+              <v-col class="text-left">
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/register"
+                >
+                  Registration
+                </nuxt-link>
+              </v-col>
+              <v-col class="text-right">
+                <nuxt-link
+                  class="text-decoration-none text-blue-darken-3"
+                  to="/auth/login"
+                >
+                  Login
+                </nuxt-link>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script setup>
+/* imports */
+const { forgotPassword } = useStrapiAuth();
+/* data */
+const form = ref(null);
+const valid = ref("");
+const loading = ref(false);
+const email = ref("");
+const message = ref("");
+const emailRules = [
+  (v) => !!v || "This field is required",
+  (v) => /.+@.+\..+/.test(v) || "E-mail must have correct format",
+];
+/* computed */
+/* methods */
+const forgotOperation = async () => {
+  loading.value = true;
+  if (form.value.validate()) {
+    try {
+      await forgotPassword({
+        email: email.value,
+      });
+      message.value =
+        "A reset password link has been sent to your email account. Please click on the link to complete the password reset.";
+    } catch (e) {
+      console.log(e);
+    }
+    loading.value = false;
+  }
+};
+/* hooks */
+// onMounted(() => {});
+</script>
+```
+</details>
+</blockquote>
+
 
 ## Добавление DevTools
 
@@ -325,13 +797,11 @@ npm i -D @nuxt/devtools
 
 Добавление в nuxt.config.js
 ```javascript
-...
   modules: ["@nuxt/devtools"],
   devtools: {
     enabled: true,
     vscode: {},
   },
-...
 ```
 DevTools можно будет включить по нажатию `Alt / ⌥ Option + D` или при нажатии кнопки Nuxt снизу
 

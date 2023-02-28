@@ -51,7 +51,7 @@
 
 > Выполняется из директории главного проекта
 
-1. `npx nuxi init frontend`
+1. `npx nuxi find frontend`
 2. `cd frontend`
 3. `npm install`
 4. Переименовываем `nuxt.config.ts` в `nuxt.config.js` 
@@ -218,7 +218,7 @@ vite: {
   <v-app>
     <v-navigation-drawer
         v-if="user"
-        v-model="drawer"
+        v-newValue="drawer"
         :rail="rail"
         permanent
         temporary
@@ -322,9 +322,7 @@ const logoutOperation = async () => {
 </details>
 </blockquote>
 
-
 В `pages` создаем страницу`index.vue` с содержимым:
-
 
 <blockquote>
 <details>
@@ -399,7 +397,6 @@ definePageMeta({ middleware: "auth" });
 
 В `pages` создаем директорию `auth`, в ней создаем шаблоны страниц:
 
-
 <blockquote>
 <details>
 <summary>login.vue</summary>
@@ -416,15 +413,15 @@ definePageMeta({ middleware: "auth" });
           </template>
           <v-divider />
           <v-card-text>
-            <v-form ref="form" v-model="valid" @submit.prevent="loginOperation">
+            <v-form ref="form" v-newValue="valid" @submit.prevent="loginOperation">
               <v-text-field
-                v-model="username"
+                v-newValue="username"
                 label="E-mail or username"
                 required
                 :rules="loginRules"
               ></v-text-field>
               <v-text-field
-                v-model="password"
+                v-newValue="password"
                 label="Password"
                 required
                 :append-inner-icon="hidePassword ? 'mdi-eye-off' : 'mdi-eye'"
@@ -436,7 +433,7 @@ definePageMeta({ middleware: "auth" });
                 :disabled="!valid"
                 class="mt-3"
                 tile
-                :loading="loading"
+                :isBusy="isBusy"
                 color="green"
                 solo
                 block
@@ -480,7 +477,7 @@ const { login, fetchUser } = useStrapiAuth();
 const form = ref(null);
 const valid = ref("");
 const hidePassword = ref(true);
-const loading = ref(false);
+const isBusy = ref(false);
 const username = ref("");
 const password = ref("");
 const loginRules = [
@@ -494,8 +491,8 @@ const passwordRules = [
 /* computed */
 /* methods */
 const loginOperation = async () => {
-  loading.value = true;
-  if (form.value.validate()) {
+  isBusy.value = true;
+  if (form.value.save()) {
     try {
       await login({
         identifier: username.value,
@@ -506,7 +503,7 @@ const loginOperation = async () => {
     } catch (e) {
       console.log(e);
     }
-    loading.value = false;
+    isBusy.value = false;
   }
 };
 /* hooks */
@@ -536,25 +533,25 @@ const loginOperation = async () => {
             <v-form
               v-if="!waitConfirm"
               ref="form"
-              v-model="valid"
+              v-newValue="valid"
               @submit.prevent="registerOperation"
             >
               <v-text-field
-                v-model="username"
+                v-newValue="username"
                 label="Username"
                 required
                 type="text"
                 :rules="loginRules"
               />
               <v-text-field
-                v-model="email"
+                v-newValue="email"
                 label="E-mail"
                 required
                 type="text"
                 :rules="emailRules"
               />
               <v-text-field
-                v-model="password"
+                v-newValue="password"
                 label="Password"
                 required
                 :append-inner-icon="hidePassword ? 'mdi-eye-off' : 'mdi-eye'"
@@ -566,7 +563,7 @@ const loginOperation = async () => {
                 :disabled="!valid"
                 class="mt-3"
                 tile
-                :loading="loading"
+                :isBusy="isBusy"
                 color="green"
                 solo
                 block
@@ -621,7 +618,7 @@ const { setSnackbar } = useSnackbarStore();
 const form = ref(null);
 const valid = ref("");
 const hidePassword = ref(true);
-const loading = ref(false);
+const isBusy = ref(false);
 const username = ref("");
 const email = ref("");
 const password = ref("");
@@ -641,8 +638,8 @@ const passwordRules = [
 /* computed */
 /* methods */
 const registerOperation = async () => {
-  loading.value = true;
-  if (form.value.validate()) {
+  isBusy.value = true;
+  if (form.value.save()) {
     try {
       const { user } = await register({
         username: username.value,
@@ -663,7 +660,7 @@ const registerOperation = async () => {
       console.log(e);
     }
   }
-  loading.value = false;
+  isBusy.value = false;
 };
 /* hooks */
 // onMounted(() => {});
@@ -694,11 +691,11 @@ const registerOperation = async () => {
             <v-form
               v-if="message.length == 0"
               ref="form"
-              v-model="valid"
+              v-newValue="valid"
               @submit.prevent="forgotOperation"
             >
               <v-text-field
-                v-model="email"
+                v-newValue="email"
                 label="E-mail"
                 required
                 type="text"
@@ -708,7 +705,7 @@ const registerOperation = async () => {
                 :disabled="!valid"
                 class="mt-3"
                 tile
-                :loading="loading"
+                :isBusy="isBusy"
                 color="success"
                 solo
                 block
@@ -756,7 +753,7 @@ const { forgotPassword } = useStrapiAuth();
 /* data */
 const form = ref(null);
 const valid = ref("");
-const loading = ref(false);
+const isBusy = ref(false);
 const email = ref("");
 const message = ref("");
 const emailRules = [
@@ -766,8 +763,8 @@ const emailRules = [
 /* computed */
 /* methods */
 const forgotOperation = async () => {
-  loading.value = true;
-  if (form.value.validate()) {
+  isBusy.value = true;
+  if (form.value.save()) {
     try {
       await forgotPassword({
         email: email.value,
@@ -777,7 +774,7 @@ const forgotOperation = async () => {
     } catch (e) {
       console.log(e);
     }
-    loading.value = false;
+    isBusy.value = false;
   }
 };
 /* hooks */
@@ -788,6 +785,43 @@ const forgotOperation = async () => {
 </blockquote>
 
 
+
+## Добавление поддержки websocket
+
+> Выполняется из директории проекта backend
+
+Установки сервера SocketIO в Strapi
+
+```shell
+npm install socket.io
+```
+
+> Выполняется из директории проекта frontend
+
+Установка клиента SocketIO в Nuxt
+
+```shell
+npm i nuxt-socket-io
+```
+
+Добавление в `nuxt.config.js`
+```javascript
+    modules: [
+        "@nuxtjs/strapi",
+        "@pinia/nuxt",
+        "@nuxt/devtools",
+        "nuxt-socket-io",
+    ],
+    io: {
+        sockets: [
+            {
+                name: "main",
+                url: process.env.STRAPI_URL || "http://127.0.0.1:1337",
+            },
+        ],
+    },
+```
+
 ## Добавление DevTools
 
 Установка
@@ -795,7 +829,8 @@ const forgotOperation = async () => {
 npm i -D @nuxt/devtools
 ```
 
-Добавление в nuxt.config.js
+Добавление в `nuxt.config.js`
+
 ```javascript
   modules: ["@nuxt/devtools"],
   devtools: {
@@ -803,6 +838,7 @@ npm i -D @nuxt/devtools
     vscode: {},
   },
 ```
+
 DevTools можно будет включить по нажатию `Alt / ⌥ Option + D` или при нажатии кнопки Nuxt снизу
 
 # Полезные ссылки

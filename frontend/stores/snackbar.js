@@ -1,7 +1,7 @@
 export const useSnackbarStore = defineStore("snackbar", {
   state: () => ({
     show: false,
-    color: "primary",
+    color: "",
     title: "",
     message: "",
     timeout: 10000,
@@ -12,7 +12,7 @@ export const useSnackbarStore = defineStore("snackbar", {
   actions: {
     setSnackbar(newOptions) {
       this.show = newOptions["show"] || false;
-      this.color = newOptions["color"] || "primary";
+      this.color = newOptions["color"] || "";
       this.title = newOptions["title"] || "";
       this.message = newOptions["message"] || "";
       this.timeout = newOptions["timeout"] || 10000;

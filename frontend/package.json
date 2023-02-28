@@ -8,7 +8,7 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^0.1.2",
+    "@nuxt/devtools": "^0.2.3",
     "@nuxtjs/strapi": "^1.7.1",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.51.0",
@@ -23,6 +23,7 @@
   "dependencies": {
     "@mdi/font": "^7.1.96",
     "@pinia/nuxt": "^0.4.6",
+    "nuxt-socket-io": "^3.0.12",
     "pinia": "^2.0.30",
     "sass": "^1.58.0",
     "vuetify": "^3.1.4"

@@ -92,12 +92,11 @@
 <script setup>
 /* imports */
 const { register, login, fetchUser } = useStrapiAuth();
-const { setSnackbar } = useSnackbarStore();
 /* data */
 const form = ref(null);
 const valid = ref("");
 const hidePassword = ref(true);
-const loading = ref(false);
+const isBusy = ref(false);
 const username = ref("");
 const email = ref("");
 const password = ref("");

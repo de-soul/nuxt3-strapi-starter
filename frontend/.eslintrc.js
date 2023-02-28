@@ -18,6 +18,7 @@ module.exports = {
   plugins: ["@typescript-eslint"],
   rules: {
     "vue/multi-word-component-names": "off",
+    "vue/require-default-prop": "off",
     "no-unused-vars": "warn",
     "space-in-parens": "off",
     "computed-property-spacing": "off",

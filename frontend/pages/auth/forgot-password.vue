@@ -76,7 +76,7 @@ const { forgotPassword } = useStrapiAuth();
 /* data */
 const form = ref(null);
 const valid = ref("");
-const loading = ref(false);
+const isBusy = ref(false);
 const email = ref("");
 const message = ref("");
 const emailRules = [

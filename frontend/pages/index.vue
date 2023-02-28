@@ -7,9 +7,9 @@
       </template>
       <v-divider />
       <v-card-text>
-        <v-code>
-          <pre>{{ flattenResponse(data) }}</pre>
-        </v-code>
+        <v-container>
+          <crud-datatable collection="tests" />
+        </v-container>
       </v-card-text>
     </v-card>
   </v-container>
@@ -17,12 +17,10 @@
 
 <script setup>
 /* imports */
-const { find } = useStrapi();
-const { flattenResponse } = useStrapiResponse();
 /* middleware */
 definePageMeta({ middleware: "auth" });
 /* data */
-const { data } = await find("tests");
 /* computed */
 /* methods */
+/* hooks */
 </script>

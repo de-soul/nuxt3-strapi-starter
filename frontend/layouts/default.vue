@@ -88,6 +88,11 @@ const pages = [
     to: "/",
   },
   {
+    icon: "mdi-swap-horizontal",
+    title: "IO page",
+    to: "/io",
+  },
+  {
     icon: "mdi-book-open-page-variant",
     title: "Test page",
     to: "/test",

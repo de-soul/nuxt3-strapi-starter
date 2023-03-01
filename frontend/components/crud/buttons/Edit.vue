@@ -4,6 +4,7 @@
     flat
     size="24"
     class="mb-1"
+    variant="text"
     :disabled="loading"
     @click="emit('editClick')"
   >

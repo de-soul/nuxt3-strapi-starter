@@ -38,7 +38,8 @@
 <script setup>
 /* Imports */
 const emit = defineEmits(["deleted"]);
-const sqlManager = useSqlManager();
+const sqlManager = useSqlManagerStore();
+const snackbar = useSnackbarStore();
 /* Data */
 const dialog = ref(false);
 const loading = ref(false);
@@ -51,6 +52,12 @@ const props = defineProps({
 const deleteItems = async () => {
   loading.value = true;
   if (await sqlManager.bulkDelete(props.collection, props.deleteList)) {
+    await snackbar.setSnackbar({
+      show: true,
+      color: "green-darken-2",
+      title: `Success`,
+      message: `Deleted ids: ${props.deleteList.join(", ")}`,
+    });
     await sqlManager.find(props.collection);
     dialog.value = false;
     emit("deleted");

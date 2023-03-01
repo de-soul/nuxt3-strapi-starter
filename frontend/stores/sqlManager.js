@@ -7,7 +7,8 @@ const {
 } = useStrapi();
 const snackbar = useSnackbarStore();
 const { flattenResponse: _flattenResponse } = useStrapiResponse();
-export const useSqlManager = defineStore("sqlmanager", {
+
+export const useSqlManagerStore = defineStore("sqlManager", {
   state: () => ({
     datasets: {},
   }),
@@ -47,12 +48,7 @@ export const useSqlManager = defineStore("sqlmanager", {
           return false;
         }
       }
-      await snackbar.setSnackbar({
-        show: true,
-        color: "green-darken-2",
-        title: `Success`,
-        message: `Deleted ids: ${ids.join(", ")}`,
-      });
+
       await this.find(collection);
       return true;
     },

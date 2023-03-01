@@ -57,6 +57,7 @@
         </v-list>
       </template>
     </v-navigation-drawer>
+
     <v-main>
       <slot />
     </v-main>

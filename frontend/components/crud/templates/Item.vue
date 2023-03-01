@@ -1,5 +1,5 @@
 <template>
-  <v-form :ref="`item-${id}-${index}`">
+  <v-form :key="`item-${id}-${index}`" v-model="model" validate-on="input">
     <v-text-field
       v-model="newValue"
       :variant="editable ? 'filled' : 'plain'"
@@ -8,7 +8,10 @@
       :color="editing ? 'success' : ''"
       hide-details
       density="compact"
-      :readonly="!editing"
+      :readonly="!editable"
+      @update:modelValue="
+        newValue !== value ? (editing = true) : (editing = false)
+      "
     >
       <template #append-inner>
         <v-row v-show="editable" no-gutters justify="center" align="center">
@@ -19,7 +22,8 @@
               @editClick="editClick"
             />
             <crud-buttons-save
-              v-else
+              v-if="editing"
+              :enabled="model"
               :loading="loading"
               @updateClick="updateClick"
             />
@@ -32,7 +36,7 @@
 
 <script setup>
 /* Imports */
-const sqlManager = useSqlManager();
+const sqlManager = useSqlManagerStore();
 const emit = defineEmits(["updated"]);
 /* Props */
 const props = defineProps({
@@ -47,18 +51,21 @@ const props = defineProps({
 const loading = ref(false);
 const newValue = ref(props.value);
 const editing = ref(false);
+const model = ref(false);
 /* Methods */
 const updateClick = async () => {
-  loading.value = true;
-  const payload = {
-    [props.field]: newValue.value,
-  };
-  if (await sqlManager.update(props.collection, props.id, payload)) {
-    await sqlManager.find(props.collection);
-    editing.value = false;
-    emit("updated");
+  if (model.value) {
+    loading.value = true;
+    const payload = {
+      [props.field]: newValue.value,
+    };
+    if (await sqlManager.update(props.collection, props.id, payload)) {
+      await sqlManager.find(props.collection);
+      editing.value = false;
+      emit("updated");
+    }
+    loading.value = false;
   }
-  loading.value = false;
 };
 const editClick = async () => {
   loading.value = true;

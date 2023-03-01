@@ -1,18 +1,22 @@
 <template>
   <v-card density="compact" elevation="3">
-    <!--    {{ items }}-->
     <v-data-table
+      :key="`datatable-${bugFixKey}`"
       v-model="selectedRows"
       :items="items"
       :headers="headers"
+      :search="search"
       show-select
     >
       <template #top>
         <crud-templates-header
+          :search="search"
           :collection="collection"
           :editable-items="editableItems"
           :delete-list="selectedRows"
+          @search="search = $event"
           @deleted="selectedRows = []"
+          @refresh="bugFixKey = bugFixKey + 1"
         />
       </template>
       <template
@@ -27,6 +31,7 @@
           :value="item.columns[header.key].toString()"
           :editable="header.editable"
           :collection="collection"
+          @updated="bugFixKey = bugFixKey + 1"
         />
       </template>
     </v-data-table>
@@ -35,12 +40,14 @@
 
 <script setup>
 /* Imports */
-const sqlManager = useSqlManager();
+const sqlManager = useSqlManagerStore();
+const search = ref("");
 /* Props */
 const props = defineProps({
   collection: String,
 });
 /* Data */
+const bugFixKey = ref(1);
 const selectedRows = ref([]);
 const systemFields = ref(["id", "createdAt", "updatedAt"]);
 /* Watch */
@@ -53,7 +60,7 @@ const headers = computed(() =>
         value: e,
         title: e,
         align: "start",
-        width: "200px",
+        minWidth: "100px",
         editable: systemFields.value.includes(e) ? false : true,
       }))
     : []
@@ -78,7 +85,6 @@ onMounted(async () => {
 }
 .v-data-table__td .v-field--variant-plain .v-field__input {
   padding: 0;
-
   font-size: 0.9rem;
 }
 </style>

@@ -413,7 +413,7 @@ definePageMeta({ middleware: "auth" });
           </template>
           <v-divider />
           <v-card-text>
-            <v-form ref="form" v-newValue="valid" @submit.prevent="loginOperation">
+            <v-form ref="form" v-newValue="model" @submit.prevent="loginOperation">
               <v-text-field
                 v-newValue="username"
                 label="E-mail or username"
@@ -430,7 +430,7 @@ definePageMeta({ middleware: "auth" });
                 @click:append-inner="() => (hidePassword = !hidePassword)"
               ></v-text-field>
               <v-btn
-                :disabled="!valid"
+                :disabled="!model"
                 class="mt-3"
                 tile
                 :isBusy="isBusy"
@@ -475,7 +475,7 @@ definePageMeta({ middleware: "auth" });
 const { login, fetchUser } = useStrapiAuth();
 /* data */
 const form = ref(null);
-const valid = ref("");
+const model = ref("");
 const hidePassword = ref(true);
 const isBusy = ref(false);
 const username = ref("");
@@ -533,7 +533,7 @@ const loginOperation = async () => {
             <v-form
               v-if="!waitConfirm"
               ref="form"
-              v-newValue="valid"
+              v-newValue="model"
               @submit.prevent="registerOperation"
             >
               <v-text-field
@@ -560,7 +560,7 @@ const loginOperation = async () => {
                 @click:append-inner="() => (hidePassword = !hidePassword)"
               />
               <v-btn
-                :disabled="!valid"
+                :disabled="!model"
                 class="mt-3"
                 tile
                 :isBusy="isBusy"
@@ -616,7 +616,7 @@ const { register, login, fetchUser } = useStrapiAuth();
 const { setSnackbar } = useSnackbarStore();
 /* data */
 const form = ref(null);
-const valid = ref("");
+const model = ref("");
 const hidePassword = ref(true);
 const isBusy = ref(false);
 const username = ref("");
@@ -691,7 +691,7 @@ const registerOperation = async () => {
             <v-form
               v-if="message.length == 0"
               ref="form"
-              v-newValue="valid"
+              v-newValue="model"
               @submit.prevent="forgotOperation"
             >
               <v-text-field
@@ -702,7 +702,7 @@ const registerOperation = async () => {
                 :rules="emailRules"
               />
               <v-btn
-                :disabled="!valid"
+                :disabled="!model"
                 class="mt-3"
                 tile
                 :isBusy="isBusy"
@@ -752,7 +752,7 @@ const registerOperation = async () => {
 const { forgotPassword } = useStrapiAuth();
 /* data */
 const form = ref(null);
-const valid = ref("");
+const model = ref("");
 const isBusy = ref(false);
 const email = ref("");
 const message = ref("");

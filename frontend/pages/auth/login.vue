@@ -71,7 +71,7 @@
 const { login, fetchUser } = useStrapiAuth();
 /* data */
 const form = ref(null);
-const valid = ref("");
+const model = ref("");
 const hidePassword = ref(true);
 const isBusy = ref(false);
 const username = ref("");

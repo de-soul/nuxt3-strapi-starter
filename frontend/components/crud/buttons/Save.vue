@@ -4,12 +4,15 @@
     flat
     size="24"
     class="mb-1"
-    :disabled="loading"
+    variant="text"
+    :disabled="!enabled"
     @click="emit('updateClick')"
   >
     <v-progress-circular v-if="loading" indeterminate size="18">
     </v-progress-circular>
-    <v-icon v-if="!loading" size="16"> mdi-content-save </v-icon>
+    <v-icon v-if="!loading" size="16" :color="enabled ? 'green' : 'red'">
+      mdi-content-save
+    </v-icon>
   </v-btn>
 </template>
 
@@ -19,5 +22,6 @@ const emit = defineEmits(["updateClick"]);
 /* Props */
 const props = defineProps({
   loading: Boolean,
+  enabled: Boolean,
 });
 </script>

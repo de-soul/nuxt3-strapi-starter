@@ -5,8 +5,8 @@
     clearable
     density="compact"
     hide-details
-    label="Filter"
-    variant="outlined"
+    label="Search"
+    variant="underlined"
     @update:modelValue="emit('search', $event)"
   />
 </template>

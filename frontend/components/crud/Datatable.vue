@@ -1,5 +1,5 @@
 <template>
-  <v-card class="rounded-lg" density="compact" elevation="3">
+  <v-card variant="flat" elevation="5">
     <v-data-table
       v-model="selectedRows"
       :headers="headers"

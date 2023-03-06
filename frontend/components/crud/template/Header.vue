@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar color="blue-grey-darken-4" flat>
+  <v-toolbar color="transparent" flat>
     <v-toolbar-title>
       <v-chip pill size="large">
         <v-avatar color="blue-darken-2" start>

@@ -71,23 +71,24 @@
 
 1. `npm install @nuxtjs/strapi --save-dev`
 2. В конфигурационный файл Nuxt `nuxt.config.js` добавляются настройки:
-```javascript
+```js
+{
   strapi: {
     url: process.env.STRAPI_URL || "http://127.0.0.1:1337",
-        prefix: "/api",
-        version: "v4",
-        cookieName: "strapi_jwt",
-        key: "authToken",
-        cookie: {
-        maxAge: 7 * 24 * 3600 * 1000,
-            sameSite: "lax",
-            secure: true,
-            path: "/",
-            httpOnly: false,
-    },
-},
+    prefix: "/api",
+    version: "v4",
+    cookieName: "strapi_jwt",
+    key: "authToken",
+    cookie: {
+    maxAge: 7 * 24 * 3600 * 1000,
+        sameSite: "lax",
+        secure: true,
+        path: "/",
+        httpOnly: false,
+    }
+  }
+}
 ```
-
 ## Проверка извлечения данных Nuxt из Strapi
 
 > Выполняется из директории проекта frontend
@@ -349,7 +350,7 @@ const logoutOperation = async () => {
 <script setup>
 /* imports */
 const { find } = useStrapi();
-const { flattenResponse } = useStrapiResponse();
+const { flattenResponse } = useStrapiHelpers();
 /* middleware */
 definePageMeta({ middleware: "auth" });
 /* data */

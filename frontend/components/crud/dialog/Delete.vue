@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="dialog"
-    max-width="500px"
+    max-width="400px"
     persistent
     transition="dialog-top-transition"
   >
@@ -10,9 +10,9 @@
         v-if="deleteList.length > 0"
         color="error"
         flat
+        icon
         prepend-icon="mdi-minus-circle"
         v-bind="props"
-        icon
       >
         <v-badge :content="deleteList.length" color="error">
           <v-icon>mdi-minus</v-icon>
@@ -21,6 +21,7 @@
     </template>
     <v-card :loading="loading">
       <v-card-text>Confirm deletion</v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn color="blue-darken-1" variant="outlined" @click="deleteItems">
@@ -39,7 +40,6 @@
 /* Imports */
 const emit = defineEmits(["deleted"]);
 const sqlManager = useSqlManagerStore();
-const snackbar = useSnackbarStore();
 /* Data */
 const dialog = ref(false);
 const loading = ref(false);
@@ -52,12 +52,6 @@ const props = defineProps({
 const deleteItems = async () => {
   loading.value = true;
   if (await sqlManager.bulkDelete(props.collection, props.deleteList)) {
-    await snackbar.setSnackbar({
-      show: true,
-      color: "green-darken-2",
-      title: `Success`,
-      message: `Deleted ids: ${props.deleteList.join(", ")}`,
-    });
     await sqlManager.find(props.collection);
     dialog.value = false;
     emit("deleted");

@@ -74,6 +74,7 @@ const form = ref(null);
 const model = ref("");
 const hidePassword = ref(true);
 const isBusy = ref(false);
+const loading = ref(false);
 const username = ref("");
 const password = ref("");
 const loginRules = [

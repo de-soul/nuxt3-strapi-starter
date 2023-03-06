@@ -4,7 +4,8 @@
   "info": {
     "singularName": "test",
     "pluralName": "tests",
-    "displayName": "Test"
+    "displayName": "Test",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -12,6 +13,12 @@
   "pluginOptions": {},
   "attributes": {
     "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "url": {
       "type": "string"
     }
   }

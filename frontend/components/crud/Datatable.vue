@@ -1,37 +1,45 @@
 <template>
-  <v-card density="compact" elevation="3">
+  <v-card class="rounded-lg" density="compact" elevation="3">
     <v-data-table
-      :key="`datatable-${bugFixKey}`"
       v-model="selectedRows"
-      :items="items"
       :headers="headers"
+      :items="items"
       :search="search"
       show-select
     >
       <template #top>
-        <crud-templates-header
-          :search="search"
+        <crud-template-header
           :collection="collection"
-          :editable-items="editableItems"
+          :columns="columns"
           :delete-list="selectedRows"
-          @search="search = $event"
+          :editable-items="editableItems"
+          :search="search"
           @deleted="selectedRows = []"
-          @refresh="bugFixKey = bugFixKey + 1"
+          @search="search = $event"
+          @unselected-columns="unselectedColumns = $event"
         />
       </template>
+      <!-- Iterate every item in row -->
       <template
-        v-for="(header, index) in headers"
-        #[`item.${header.key}`]="{ item }"
-        :key="`row-${index}`"
+        v-for="(column, index) in columns"
+        :key="`row-${item.columns.id}-${index}`"
+        #[`item.${column.name}`]="{ item }"
       >
-        <crud-templates-item
+        <crud-template-item
+          v-if="index !== columns.length - 1"
           :id="item.columns.id"
-          :index="index"
-          :field="header.key"
-          :value="item.columns[header.key].toString()"
-          :editable="header.editable"
           :collection="collection"
-          @updated="bugFixKey = bugFixKey + 1"
+          :editable="column.editable"
+          :field="column.name"
+          :text="
+            item.columns[column.name]
+              ? item.columns[column.name].toString()
+              : ''
+          "
+        />
+        <crud-menu-action-button
+          v-if="index === columns.length - 1 && headers.length !== 1"
+          :row="getRow(item.columns)"
         />
       </template>
     </v-data-table>
@@ -41,34 +49,83 @@
 <script setup>
 /* Imports */
 const sqlManager = useSqlManagerStore();
+const { systemFields } = useStrapiHelpers();
 const search = ref("");
 /* Props */
 const props = defineProps({
   collection: String,
 });
 /* Data */
-const bugFixKey = ref(1);
 const selectedRows = ref([]);
-const systemFields = ref(["id", "createdAt", "updatedAt"]);
-/* Watch */
+const unselectedColumns = ref([]);
+const headerDefaults = ref({
+  key: "",
+  value: "",
+  title: "",
+  align: "start",
+  minWidth: "100px",
+});
+
+const actionsDefaults = ref({
+  column: {
+    name: "",
+    active: true,
+    editable: true,
+  },
+  header: {
+    key: "",
+    sortable: false,
+    width: 46,
+  },
+});
 /* Computed */
 const items = computed(() => sqlManager.items(props.collection));
-const headers = computed(() =>
-  items.value.length > 0
-    ? Object.keys(items.value[0]).map((e) => ({
-        key: e,
-        value: e,
-        title: e,
-        align: "start",
-        minWidth: "100px",
-        editable: systemFields.value.includes(e) ? false : true,
-      }))
-    : []
-);
+const headers = computed(() => {
+  if (items.value.length > 0) {
+    const headers = Object.keys(items.value[0])
+      .filter((e) => !unselectedColumns.value.includes(e))
+      .map((e) => ({
+        ...headerDefaults.value,
+        ...headerOptions(e),
+      }));
+    headers.push({
+      ...headerDefaults.value,
+      ...actionsDefaults.value.header,
+    });
+    return headers;
+  }
+  return [];
+});
 const editableItems = computed(() =>
-  headers.value.filter((h) => h.editable).map((h) => h.key)
+  columns.value.filter((c) => c.editable && c.name).map((c) => c.name)
 );
+const columns = computed(() => {
+  if (items.value.length > 0) {
+    const columns = Object.keys(items.value[0]).map((e) => ({
+      name: e,
+      active: isActive(e),
+      editable: isEditable(e),
+    }));
+    columns.push(actionsDefaults.value.column);
+    return columns;
+  }
+  return [];
+});
 /* Methods */
+const headerOptions = (field) => {
+  return {
+    key: field,
+    value: field,
+    title: field,
+  };
+};
+const isActive = (field) => !unselectedColumns.value.includes(field);
+const isEditable = (field) => !systemFields.value.find((f) => f.name === field);
+const getRow = (item) =>
+  Object.entries(item).map(([name, value]) => ({
+    name: name,
+    value: value ? value : "",
+  }));
 /* Hooks */
 onMounted(async () => {
   await sqlManager.find(props.collection);
@@ -80,9 +137,11 @@ onMounted(async () => {
 .v-table > .v-table__wrapper > table > tbody > tr > td {
   padding: 0 6px;
 }
+
 .v-data-table__td {
   line-height: 0.8rem;
 }
+
 .v-data-table__td .v-field--variant-plain .v-field__input {
   padding: 0;
   font-size: 0.9rem;

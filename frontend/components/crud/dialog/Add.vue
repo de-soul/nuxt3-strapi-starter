@@ -1,46 +1,44 @@
 <template>
   <v-dialog
     v-model="dialog"
-    max-width="500px"
+    max-width="400px"
     persistent
     transition="dialog-top-transition"
   >
     <template #activator="{ props }">
-      <v-btn dark flat v-bind="props" icon>
+      <v-btn dark flat icon v-bind="props">
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </template>
     <v-card :loading="loading">
       <v-card-title>
-        <span class="text-h5">
-          New <strong>{{ collection }}</strong> element
-        </span>
+        New <strong>{{ collection }}</strong> element
       </v-card-title>
+      <v-divider />
       <v-card-text>
-        <v-container>
-          <v-form ref="form" v-model="formModel" validate-on="input">
-            <v-row v-for="(item, i) in items" :key="i">
-              <v-col>
-                <v-text-field
-                  v-model="itemModel[item]"
-                  variant="filled"
-                  density="compact"
-                  :label="item"
-                  clearable
-                  :rules="rules"
-                  @click:clear="formValid"
-                />
-              </v-col>
-            </v-row>
-          </v-form>
-        </v-container>
+        <v-form ref="form" v-model="formModel" validate-on="input">
+          <v-row v-for="(item, i) in items" :key="i" dense>
+            <v-col>
+              <v-text-field
+                v-model="itemModel[item]"
+                :label="item"
+                :rules="rules"
+                clearable
+                density="compact"
+                variant="filled"
+                @click:clear="formValid"
+              />
+            </v-col>
+          </v-row>
+        </v-form>
       </v-card-text>
+      <v-divider />
       <v-card-actions>
         <v-spacer />
         <v-btn
+          :disabled="!formModel"
           color="blue-darken-1"
           variant="outlined"
-          :disabled="!formModel"
           @click="addClick"
         >
           Save
@@ -84,13 +82,13 @@ const addClick = async () => {
   if (formValid) {
     if (await sqlManager.add(props.collection, itemModel.value)) {
       await sqlManager.find(props.collection);
+
       dialog.value = false;
       itemModel.value = {};
     }
   }
   loading.value = false;
 };
-
 const cancelClick = async () => {
   dialog.value = false;
   itemModel.value = {};

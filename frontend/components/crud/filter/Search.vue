@@ -1,10 +1,10 @@
 <template>
   <v-text-field
     :model-value="search"
-    density="compact"
-    hide-details
     class="px-3 min-width-search"
     clearable
+    density="compact"
+    hide-details
     label="Filter"
     variant="outlined"
     @update:modelValue="emit('search', $event)"
@@ -12,9 +12,8 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   search: String,
 });
-const model = ref("");
 const emit = defineEmits(["search"]);
 </script>

@@ -1,4 +1,4 @@
-import { useSnackbarStore } from "~/stores/snackbar";
+import { useSnackbarStore } from "~/stores/useSnackbarStore";
 const {
   find: _find,
   delete: _delete,
@@ -6,8 +6,6 @@ const {
   update: _update,
 } = useStrapi();
 const snackbar = useSnackbarStore();
-const { flattenResponse: _flattenResponse } = useStrapiResponse();
-
 export const useSqlManagerStore = defineStore("sqlManager", {
   state: () => ({
     datasets: {},
@@ -19,7 +17,8 @@ export const useSqlManagerStore = defineStore("sqlManager", {
     async find(collection) {
       try {
         const { data } = await _find(collection);
-        this.datasets[collection] = _flattenResponse(data);
+        this.datasets[collection] = {};
+        this.datasets[collection] = data;
         return true;
       } catch (e) {
         console.log(`Error get records from collection ${collection}`);
@@ -30,7 +29,6 @@ export const useSqlManagerStore = defineStore("sqlManager", {
     async delete(collection, id) {
       try {
         await _delete(collection, id);
-        await this.find(collection);
         return true;
       } catch (e) {
         console.log(`Error deleting id ${id} from collection ${collection}`);
@@ -48,8 +46,13 @@ export const useSqlManagerStore = defineStore("sqlManager", {
           return false;
         }
       }
-
-      await this.find(collection);
+      await snackbar.setSnackbar({
+        show: true,
+        color: "green-darken-2",
+        title: `Success`,
+        message: `Deleted ids: ${ids.join(", ")}`,
+      });
+      // await this.find(collection);
       return true;
     },
     async add(collection, payload) {
